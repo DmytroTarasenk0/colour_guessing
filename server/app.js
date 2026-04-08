@@ -30,10 +30,14 @@ const calculateScore = (target, guess) => {
   return percentage;
 };
 
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  process.env.CLIENT_URL, // global app
+];
 // setup Socket.IO server with CORS settings to allow requests from client
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
 });
