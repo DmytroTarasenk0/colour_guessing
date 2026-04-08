@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
-import "./styles.css";
+import { useNavigate } from "react-router-dom";
 
-const ColourGuesser = () => {
+const SingleplayerGame = () => {
   const [gameState, setGameState] = useState("idle"); // idle, memorising, guessing, result
   const [targetColour, setTargetColour] = useState({ r: 0, g: 0, b: 0 });
   const [userHex, setUserHex] = useState("#ffffff");
   const [timeLeft, setTimeLeft] = useState(0);
   const [score, setScore] = useState(null);
+
+  const navigate = useNavigate();
 
   // generate a random RGB colour for the target
   const generateRandomColour = () => ({
@@ -74,82 +76,87 @@ const ColourGuesser = () => {
   };
 
   return (
-    <div className="app-container">
-      <div className="game-board">
-        <h2 className="game-title">Colour Guesser</h2>
+    <div className="game-board fade-in">
+      <h2 className="game-title">Colour Guesser</h2>
 
-        {gameState === "idle" && (
+      {gameState === "idle" && (
+        <div>
           <button className="action-button fade-in" onClick={startGame}>
             Start Game
           </button>
-        )}
+          <button
+            className="back-link"
+            onClick={() => navigate("/")}
+            style={{ marginTop: "15px" }}
+          >
+            Back to Menu
+          </button>
+        </div>
+      )}
 
-        {gameState === "memorising" && (
-          <div className="fade-in">
-            <p>Memorise this colour</p>
-            <div className="timer-text">{timeLeft}s</div>
+      {gameState === "memorising" && (
+        <div className="fade-in">
+          <p>Memorise this colour</p>
+          <div className="timer-text">{timeLeft}s</div>
+          <div
+            className="colour-display"
+            style={{ backgroundColor: rgbString(targetColour) }}
+          />
+        </div>
+      )}
+
+      {gameState === "guessing" && (
+        <div className="fade-in">
+          <p>Recreate the colour</p>
+          <div className="timer-text">{timeLeft}s</div>
+          <div className="picker-container">
+            <HexColorPicker color={userHex} onChange={setUserHex} />
+          </div>
+          <div className="current-guess-row">
+            <span>Current Guess:</span>
             <div
-              className="colour-display"
-              style={{ backgroundColor: rgbString(targetColour) }}
+              className="mini-preview"
+              style={{ backgroundColor: userHex }}
             />
           </div>
-        )}
+          <button className="action-button" onClick={handleSubmit}>
+            Submit Guess
+          </button>
+        </div>
+      )}
 
-        {gameState === "guessing" && (
-          <div className="fade-in">
-            <p>Recreate the colour</p>
-            <div className="timer-text">{timeLeft}s</div>
-
-            <div className="picker-container">
-              <HexColorPicker color={userHex} onChange={setUserHex} />
-            </div>
-
-            <div className="current-guess-row">
-              <span>Current Guess:</span>
+      {gameState === "result" && (
+        <div className="fade-in">
+          <h3>Result</h3>
+          <p style={{ fontSize: "20px", color: "#4caf50", margin: "15px 0" }}>
+            Accuracy: <strong>{score}%</strong>
+          </p>
+          <div className="result-row">
+            <div className="result-box">
+              <strong>Target</strong>
               <div
-                className="mini-preview"
+                className="result-colour"
+                style={{ backgroundColor: rgbString(targetColour) }}
+              />
+            </div>
+            <div className="result-box">
+              <strong>Your Guess</strong>
+              <div
+                className="result-colour"
                 style={{ backgroundColor: userHex }}
               />
             </div>
-
-            <button className="action-button" onClick={handleSubmit}>
-              Submit Guess
-            </button>
           </div>
-        )}
-
-        {gameState === "result" && (
-          <div className="fade-in">
-            <h3>Result</h3>
-            <p style={{ fontSize: "20px", color: "#4caf50", margin: "15px 0" }}>
-              Accuracy: <strong>{score}%</strong>
-            </p>
-
-            <div className="result-row">
-              <div className="result-box">
-                <strong>Target</strong>
-                <div
-                  className="result-colour"
-                  style={{ backgroundColor: rgbString(targetColour) }}
-                />
-              </div>
-              <div className="result-box">
-                <strong>Your Guess</strong>
-                <div
-                  className="result-colour"
-                  style={{ backgroundColor: userHex }}
-                />
-              </div>
-            </div>
-
-            <button className="action-button" onClick={startGame}>
-              Play Again
-            </button>
-          </div>
-        )}
-      </div>
+          <button className="action-button" onClick={startGame}>
+            Play Again
+          </button>
+          <button className="back-link" onClick={() => navigate("/")}>
+            Back to Menu
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ColourGuesser;
+export default SingleplayerGame;
